@@ -1,13 +1,13 @@
 # Buyer Workflow MVP
 
-A Slack app that streamlines the buyer onboarding process by collecting detailed buyer profiles through interactive modals.
+A Slack app that streamlines the buyer onboarding process by collecting detailed buyer preferences through interactive modals.
 
 ## Features
 
-- **🔗 Slash Command Integration**: Use `/buyer-profile` to trigger the buyer profile collection workflow
-- **📋 Interactive Modal**: Clean, user-friendly form with dropdowns and text inputs
-- **💼 Comprehensive Data Collection**: Captures company name, industry, budget range, and project requirements
-- **✅ Instant Confirmation**: Sends formatted confirmation message with collected data
+- **🔗 Slash Command Integration**: Use `/buyer-profile` to trigger the buyer preferences collection workflow
+- **📋 Interactive Modal**: Clean, user-friendly form with text inputs for real estate preferences
+- **🏠 Comprehensive Data Collection**: Captures search areas, price range, bedrooms, and must-haves/notes
+- **✅ Instant Confirmation**: Sends formatted confirmation message with collected preferences
 - **👋 Friendly Greeting**: Responds to "hello" messages with helpful guidance
 
 ## Setup and Installation
@@ -25,7 +25,9 @@ A Slack app that streamlines the buyer onboarding process by collecting detailed
 3. Add the following **OAuth Scopes** under "OAuth & Permissions":
    - `chat:write`
    - `commands`
-   - `im:write`
+   - `channels:history`
+   - `app_mentions:read`
+   - `files:write` (optional, for future PDF export functionality)
 
 4. Add the following **Slash Commands**:
    - Command: `/buyer-profile`
@@ -34,7 +36,7 @@ A Slack app that streamlines the buyer onboarding process by collecting detailed
 
 5. **Subscribe to Bot Events** under "Event Subscriptions":
    - `message.channels`
-   - `message.im`
+   - `app_mention`
 
 6. **Generate tokens**:
    - Copy your **Bot User OAuth Token** (starts with `xoxb-`)
@@ -79,27 +81,28 @@ A Slack app that streamlines the buyer onboarding process by collecting detailed
 2. You should see the message: `⚡️ Buyer Workflow MVP is running!`
 
 3. In your Slack workspace:
-   - Type "hello" to get a friendly greeting and instructions
-   - Use `/buyer-profile` to open the buyer profile modal
+   - Invite the bot to a public channel: `/invite @Buyer Workflow MVP`
+   - Type "hello" in the channel to get a friendly greeting and instructions
+   - Use `/buyer-profile` to open the buyer preferences modal
    - Fill out the form and submit to see the confirmation message
 
 ## Usage
 
 ### Buyer Profile Command
 
-1. Type `/buyer-profile` in any Slack channel or direct message
+1. Type `/buyer-profile` in any Slack channel where the bot is present
 2. Fill out the modal form with:
-   - **Company Name**: Your organization's name
-   - **Industry**: Select from predefined options (Technology, Healthcare, Finance, etc.)
-   - **Budget Range**: Choose your project budget range
-   - **Project Requirements**: Describe your specific needs
+   - **Search Areas**: Desired neighborhoods/locations
+   - **Price Range**: Preferred budget
+   - **Bedrooms**: Target number of bedrooms
+   - **Must-Haves / Notes**: Key features or requirements
 
-3. Click "Submit" to save your profile
+3. Click "Submit" to save your preferences
 4. Receive an instant confirmation message with your submitted information
 
 ### Hello Message
 
-Simply type "hello" in a channel where the bot is present or in a direct message to receive a greeting and usage instructions.
+Simply type "hello" in a channel where the bot is present to receive a greeting and usage instructions.
 
 ## Project Structure
 
@@ -116,6 +119,12 @@ buyer-workflow-mvp/
 
 - **@slack/bolt**: Slack Bolt framework for building Slack apps
 - **dotenv**: Environment variable management
+
+## Security
+
+- Credentials are loaded from `.env` file for local development
+- In production, store sensitive tokens via encrypted environment variables or a secret manager
+- Never commit `.env` files or tokens to version control
 
 ## License
 
