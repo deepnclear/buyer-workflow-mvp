@@ -11,6 +11,7 @@ const app = new App({
 
 // Handle /buyer-profile slash command
 app.command('/buyer-profile', async ({ command, ack, body, client }) => {
+  console.log('🔧 DEBUG: /buyer-profile command received');
   await ack();
 
   try {
@@ -22,7 +23,7 @@ app.command('/buyer-profile', async ({ command, ack, body, client }) => {
         callback_id: 'buyer_profile_modal',
         title: {
           type: 'plain_text',
-          text: 'Buyer Profile'
+          text: 'Buyer Preferences'
         },
         submit: {
           type: 'plain_text',
@@ -35,115 +36,67 @@ app.command('/buyer-profile', async ({ command, ack, body, client }) => {
         blocks: [
           {
             type: 'input',
-            block_id: 'company_name',
+            block_id: 'search_area',
             element: {
               type: 'plain_text_input',
-              action_id: 'company_name_input',
+              action_id: 'search_area_input',
               placeholder: {
                 type: 'plain_text',
-                text: 'Enter your company name'
+                text: 'e.g., Downtown, Suburbs, Specific neighborhoods'
               }
             },
             label: {
               type: 'plain_text',
-              text: 'Company Name'
+              text: 'Search Area'
             }
           },
           {
             type: 'input',
-            block_id: 'industry',
-            element: {
-              type: 'static_select',
-              action_id: 'industry_select',
-              placeholder: {
-                type: 'plain_text',
-                text: 'Select your industry'
-              },
-              options: [
-                {
-                  text: { type: 'plain_text', text: 'Technology' },
-                  value: 'technology'
-                },
-                {
-                  text: { type: 'plain_text', text: 'Healthcare' },
-                  value: 'healthcare'
-                },
-                {
-                  text: { type: 'plain_text', text: 'Finance' },
-                  value: 'finance'
-                },
-                {
-                  text: { type: 'plain_text', text: 'Manufacturing' },
-                  value: 'manufacturing'
-                },
-                {
-                  text: { type: 'plain_text', text: 'Retail' },
-                  value: 'retail'
-                },
-                {
-                  text: { type: 'plain_text', text: 'Other' },
-                  value: 'other'
-                }
-              ]
-            },
-            label: {
-              type: 'plain_text',
-              text: 'Industry'
-            }
-          },
-          {
-            type: 'input',
-            block_id: 'budget_range',
-            element: {
-              type: 'static_select',
-              action_id: 'budget_select',
-              placeholder: {
-                type: 'plain_text',
-                text: 'Select your budget range'
-              },
-              options: [
-                {
-                  text: { type: 'plain_text', text: '$1,000 - $5,000' },
-                  value: '1000-5000'
-                },
-                {
-                  text: { type: 'plain_text', text: '$5,000 - $10,000' },
-                  value: '5000-10000'
-                },
-                {
-                  text: { type: 'plain_text', text: '$10,000 - $25,000' },
-                  value: '10000-25000'
-                },
-                {
-                  text: { type: 'plain_text', text: '$25,000 - $50,000' },
-                  value: '25000-50000'
-                },
-                {
-                  text: { type: 'plain_text', text: '$50,000+' },
-                  value: '50000+'
-                }
-              ]
-            },
-            label: {
-              type: 'plain_text',
-              text: 'Budget Range'
-            }
-          },
-          {
-            type: 'input',
-            block_id: 'requirements',
+            block_id: 'price_range',
             element: {
               type: 'plain_text_input',
-              action_id: 'requirements_input',
+              action_id: 'price_range_input',
+              placeholder: {
+                type: 'plain_text',
+                text: 'e.g., $300,000 - $500,000'
+              }
+            },
+            label: {
+              type: 'plain_text',
+              text: 'Price Range'
+            }
+          },
+          {
+            type: 'input',
+            block_id: 'bedrooms',
+            element: {
+              type: 'plain_text_input',
+              action_id: 'bedrooms_input',
+              placeholder: {
+                type: 'plain_text',
+                text: 'e.g., 3, 2-4, 3+'
+              }
+            },
+            label: {
+              type: 'plain_text',
+              text: 'Bedrooms'
+            }
+          },
+          {
+            type: 'input',
+            block_id: 'must_haves_notes',
+            element: {
+              type: 'plain_text_input',
+              action_id: 'must_haves_notes_input',
               multiline: true,
               placeholder: {
                 type: 'plain_text',
-                text: 'Describe your project requirements...'
+                text: 'e.g., Must have garage, prefer updated kitchen, close to schools...'
               }
             },
             label: {
               type: 'plain_text',
-              text: 'Project Requirements'
+              text: 'Must-Haves / Notes'
             }
           }
         ]
@@ -160,22 +113,22 @@ app.view('buyer_profile_modal', async ({ ack, body, view, client }) => {
 
   // Extract form data
   const values = view.state.values;
-  const companyName = values.company_name.company_name_input.value;
-  const industry = values.industry.industry_select.selected_option.value;
-  const budgetRange = values.budget_range.budget_select.selected_option.value;
-  const requirements = values.requirements.requirements_input.value;
+  const searchArea = values.search_area.search_area_input.value;
+  const priceRange = values.price_range.price_range_input.value;
+  const bedrooms = values.bedrooms.bedrooms_input.value;
+  const mustHavesNotes = values.must_haves_notes.must_haves_notes_input.value;
 
   try {
     // Send confirmation message to user
     await client.chat.postMessage({
       channel: body.user.id,
-      text: `Thank you for submitting your buyer profile!`,
+      text: `Thank you for submitting your buyer preferences!`,
       blocks: [
         {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: '*Buyer Profile Submitted Successfully!*'
+            text: '*Buyer Preferences Submitted Successfully!*'
           }
         },
         {
@@ -183,19 +136,19 @@ app.view('buyer_profile_modal', async ({ ack, body, view, client }) => {
           fields: [
             {
               type: 'mrkdwn',
-              text: `*Company:* ${companyName}`
+              text: `*Search Area:* ${searchArea}`
             },
             {
               type: 'mrkdwn',
-              text: `*Industry:* ${industry}`
+              text: `*Price Range:* ${priceRange}`
             },
             {
               type: 'mrkdwn',
-              text: `*Budget:* ${budgetRange}`
+              text: `*Bedrooms:* ${bedrooms}`
             },
             {
               type: 'mrkdwn',
-              text: `*Requirements:* ${requirements}`
+              text: `*Must-Haves / Notes:* ${mustHavesNotes}`
             }
           ]
         }
@@ -208,6 +161,7 @@ app.view('buyer_profile_modal', async ({ ack, body, view, client }) => {
 
 // Handle simple hello message
 app.message('hello', async ({ message, say }) => {
+  console.log('🔧 DEBUG: Hello message received from user:', message.user);
   // Skip bot messages
   if (message.subtype === 'bot_message') return;
 
