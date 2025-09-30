@@ -1,18 +1,22 @@
 {
   "name": "buyer-workflow-mvp",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A Slack app for collecting buyer profiles through interactive modals",
-  "main": "index.js",
+  "main": "index-http.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node index.js",
-    "start": "node index.js"
+    "dev": "node index-http.js",
+    "start": "node index-http.js",
+    "start:socket": "node index.js",
+    "start:http": "node index-http.js"
   },
   "keywords": ["slack", "bot", "buyer", "profile", "modal", "workflow"],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@slack/bolt": "^4.4.0",
-    "dotenv": "^17.2.2"
+    "@slack/web-api": "^7.0.0",
+    "dotenv": "^17.2.2",
+    "express": "^4.18.2"
   }
 }

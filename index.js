@@ -1,7 +1,10 @@
 require('dotenv').config();
 const { App } = require('@slack/bolt');
 
-// Initialize Slack Bolt app with Socket Mode
+// ============================================
+// INITIALIZE SLACK APP (SOCKET MODE)
+// ============================================
+
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -9,13 +12,18 @@ const app = new App({
   socketMode: true,
 });
 
-// Handle /buyer-profile slash command
+// ============================================
+// SLASH COMMAND HANDLER
+// ============================================
+
+/**
+ * Handles /buyer-profile slash command
+ * Opens a modal form for collecting buyer preferences
+ */
 app.command('/buyer-profile', async ({ command, ack, body, client }) => {
-  console.log('🔧 DEBUG: /buyer-profile command received');
   await ack();
 
   try {
-    // Open modal with buyer profile form
     await client.views.open({
       trigger_id: body.trigger_id,
       view: {
@@ -107,11 +115,17 @@ app.command('/buyer-profile', async ({ command, ack, body, client }) => {
   }
 });
 
-// Handle modal submission
+// ============================================
+// MODAL SUBMISSION HANDLER
+// ============================================
+
+/**
+ * Handles modal submission for buyer preferences
+ * Sends confirmation message with submitted data
+ */
 app.view('buyer_profile_modal', async ({ ack, body, view, client }) => {
   await ack();
 
-  // Extract form data
   const values = view.state.values;
   const searchArea = values.search_area.search_area_input.value;
   const priceRange = values.price_range.price_range_input.value;
@@ -119,10 +133,9 @@ app.view('buyer_profile_modal', async ({ ack, body, view, client }) => {
   const mustHavesNotes = values.must_haves_notes.must_haves_notes_input.value;
 
   try {
-    // Send confirmation message to user
     await client.chat.postMessage({
       channel: body.user.id,
-      text: `Thank you for submitting your buyer preferences!`,
+      text: 'Thank you for submitting your buyer preferences!',
       blocks: [
         {
           type: 'section',
@@ -159,25 +172,48 @@ app.view('buyer_profile_modal', async ({ ack, body, view, client }) => {
   }
 });
 
-// Handle simple hello message
-app.message('hello', async ({ message, say }) => {
-  console.log('🔧 DEBUG: Hello message received from user:', message.user);
-  // Skip bot messages
-  if (message.subtype === 'bot_message') return;
+// ============================================
+// MESSAGE HANDLER
+// ============================================
 
-  await say(`Hello <@${message.user}>! 👋 Use the \`/buyer-profile\` command to get started with your project.`);
+/**
+ * Responds to "hello" messages with greeting and instructions
+ * Includes bot message filtering to prevent infinite loops
+ */
+app.message('hello', async ({ message, say }) => {
+  // Ignore bot messages to prevent infinite loops
+  if (message.bot_id || message.subtype === 'bot_message') {
+    return;
+  }
+
+  // Skip message edits, deletes, and other subtypes
+  if (message.subtype && message.subtype !== 'thread_broadcast') {
+    return;
+  }
+
+  try {
+    await say(`Hello <@${message.user}>! 👋 Use the \`/buyer-profile\` command to get started with your project.`);
+  } catch (error) {
+    console.error('Error sending message:', error);
+  }
 });
 
-// Error handling
+// ============================================
+// ERROR HANDLING
+// ============================================
+
 app.error((error) => {
   console.error('App error occurred:', error);
 });
 
-// Start the app
+// ============================================
+// START APP
+// ============================================
+
 (async () => {
   try {
     await app.start(process.env.PORT || 3000);
-    console.log('⚡️ Buyer Workflow MVP is running!');
+    console.log('⚡️ Buyer Workflow MVP (Socket Mode) is running!');
   } catch (error) {
     console.error('Error starting app:', error);
     process.exit(1);
